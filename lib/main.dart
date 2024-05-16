@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/global_context.dart';
+import 'package:flutter_application_1/pages/login.dart';
+import 'components/app_bar.dart';
+import 'components/drawer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,163 +15,26 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: GlobalContext.navigatorKey,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: const MaterialColor(0xFF5100FF, <int, Color>{
-            50: Color.fromRGBO(81, 0, 255, 0.1),
-            100: Color.fromRGBO(81, 0, 255, 0.2),
-            200: Color.fromRGBO(81, 0, 255, 0.3),
-            300: Color.fromRGBO(81, 0, 255, 0.4),
-            400: Color.fromRGBO(81, 0, 255, 0.5),
-            500: Color.fromRGBO(81, 0, 255, 0.6),
-            600: Color.fromRGBO(81, 0, 255, 0.7),
-            700: Color.fromRGBO(81, 0, 255, 0.8),
-            800: Color.fromRGBO(81, 0, 255, 0.9),
-            900: Color.fromRGBO(81, 0, 255, 1),
-          }),
-        ),
-        textTheme: const TextTheme(
-          headlineMedium: TextStyle(
-            fontSize: 36.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        appBarTheme: const AppBarTheme(
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20.0,
-          ),
-          toolbarTextStyle: TextStyle(
-            color: Colors.white,
-          ),
-          iconTheme: IconThemeData(
-            color: Colors.white,
-          ),
-        ),
-        scaffoldBackgroundColor: Colors.white,
-        drawerTheme: const DrawerThemeData(
-          backgroundColor: Colors.white,
-        ),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Het Bewuste Boeken Buro'),
+      home: HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // titleTextStyle: const TextStyle(color: Colors.white),
-        // toolbarTextStyle: const TextStyle(color: Colors.white),
-        title: Center(
-            child: Text(
-          widget.title,
-          style: const TextStyle(color: Colors.white),
-        )),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).primaryColor,
-              Theme.of(context).colorScheme.tertiary
-            ],
-          )),
-        ),
+      drawer: CustomDrawer(key: const Key('drawer')),
+      appBar: CustomAppBar(
+        key: const Key('app_bar'),
+        title: const Text('Het bewuste boeken buro',
+            style: TextStyle(fontSize: 20, color: Colors.white)),
       ),
-      drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            ListTile(
-              title: const Text('Auteurs'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Genres'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Boeken'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Log uit'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: const Login(key: Key('login')),
     );
   }
 }
