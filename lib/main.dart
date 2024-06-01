@@ -1,30 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/global_context.dart';
+import 'package:flutter_application_1/pages/boeken.dart';
 import 'package:flutter_application_1/pages/login.dart';
+import 'package:flutter_application_1/providers/login_manager.dart';
+import 'package:provider/provider.dart';
 import 'components/app_bar.dart';
 import 'components/drawer.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => LoginManager(), child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
+
+  MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(fontFamily: 'Inter'),
-      navigatorKey: GlobalContext.navigatorKey,
+      navigatorKey: appNavigatorKey,
       title: 'Flutter Demo',
-      home: HomePage(),
+      home: MainPage(),
     );
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+final GlobalKey<NavigatorState> mainPageNavigatorKey =
+    GlobalKey<NavigatorState>();
+
+class MainPage extends StatelessWidget {
+  MainPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +44,36 @@ class HomePage extends StatelessWidget {
         title: const Text('Het bewuste boeken buro',
             style: TextStyle(fontSize: 20, color: Colors.white)),
       ),
-      body: const Login(key: Key('login')),
+      body: Navigator(
+        key: mainPageNavigatorKey,
+        initialRoute: '/',
+        onGenerateRoute: (RouteSettings settings) {
+          WidgetBuilder builder;
+          switch (settings.name) {
+            case '/':
+              builder = (BuildContext _) => Consumer<LoginManager>(
+                    builder: (context, loginProvider, child) {
+                      if (loginProvider.isLoggedIn) {
+                        return const Boeken(
+                            key: Key(
+                                'boeken')); // Show Dashboard if user is logged in
+                      } else {
+                        return const Login(
+                            key: Key(
+                                'login')); // Show Login page if user is not logged in
+                      }
+                    },
+                  );
+              break;
+            case '/boeken':
+              builder = (BuildContext _) => const Boeken();
+              break;
+            default:
+              throw Exception('Invalid route: ${settings.name}');
+          }
+          return MaterialPageRoute(builder: builder, settings: settings);
+        },
+      ),
     );
   }
 }

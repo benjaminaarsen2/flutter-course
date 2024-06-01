@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/button.dart';
-import 'package:flutter_application_1/global_context.dart';
-import 'package:flutter_application_1/providers/login_provider.dart';
-import 'package:flutter_application_1/providers/secure_storage_provider.dart';
+import 'package:flutter_application_1/providers/login_manager.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatelessWidget {
   const Login({super.key});
@@ -18,7 +17,7 @@ class Login extends StatelessWidget {
             const Text('Login', style: TextStyle(fontSize: 50)),
             Container(
               padding: const EdgeInsets.all(20),
-              child: LoginForm(),
+              child: const LoginForm(),
             ),
           ],
         ),
@@ -59,6 +58,9 @@ class LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    if (!mounted) {
+      return Container();
+    }
     return Form(
       key: _formKey,
       child: Column(
@@ -80,22 +82,32 @@ class LoginFormState extends State<LoginForm> {
           ),
           const Padding(padding: EdgeInsets.all(25)),
           CustomButton(
-              key: const Key('login_button'),
-              onPressed: () => {
-                    if (_formKey.currentState!.validate())
-                      {
-                        login(email, password)
-                            .then((accessToken) => {
-                                  SecureStorage().write('jwt', accessToken),
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text('Login successful'))),
-                                })
-                            .catchError((error) => {print(error)})
-                      }
-                  },
-              child:
-                  const Text('Login', style: TextStyle(color: Colors.white))),
+            key: const Key('login_button'),
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                bool loginSuccessful =
+                    await Provider.of<LoginManager>(context, listen: false)
+                        .login(email, password);
+                if (loginSuccessful) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Login successful!'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                  Navigator.pushNamed(context, '/');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Login failed!'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Login', style: TextStyle(color: Colors.white)),
+          ),
         ],
       ),
     );
