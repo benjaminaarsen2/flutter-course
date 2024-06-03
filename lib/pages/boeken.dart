@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/components/cards_page.dart';
+import 'package:flutter_application_1/components/clickable_card.dart';
+import 'package:flutter_application_1/main.dart';
+import 'package:flutter_application_1/pages/create_update.dart';
 import 'package:flutter_application_1/providers/api_manager.dart';
 import 'package:flutter_application_1/storage_classes/boek.dart';
 
@@ -17,33 +21,13 @@ class Boeken extends StatelessWidget {
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
-          return Scaffold(
-            body: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Boeken',
-                      style: TextStyle(
-                        fontSize: 30,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView(
-                      children: snapshot.data!
-                          .map((boek) => _BoekItem(
-                                boek: boek,
-                              ))
-                          .toList(),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          );
+          return CardsPage(
+              title: 'Boeken',
+              cards: snapshot.data!
+                  .map((boek) => _BoekItem(
+                        boek: boek,
+                      ))
+                  .toList());
         }
       },
     );
@@ -58,19 +42,15 @@ class _BoekItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ListTile(
-          title: Text(boek.name,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-          subtitle:
-              Text(boek.author.name, style: const TextStyle(fontSize: 15)),
-        ),
-        const Divider(
-          thickness: 2,
-        )
-      ],
+    return ClickableCard(
+      child: ListTile(
+        title: Text(boek.name),
+        subtitle: Text(boek.author.name),
+      ),
+      onPressed: () => {
+        mainPageNavigatorKey.currentState!.pushNamed('/create_update_boek',
+            arguments: CreateUpdateBoekArguments(boek: boek))
+      },
     );
   }
 }

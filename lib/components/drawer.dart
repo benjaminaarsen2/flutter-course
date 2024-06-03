@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/main.dart';
-import 'package:flutter_application_1/pages/boeken.dart';
 import 'package:flutter_application_1/providers/login_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -33,12 +32,16 @@ class CustomDrawer extends Drawer {
                   title: const Text('Auteurs'),
                   onTap: () {
                     Navigator.pop(context);
+                    mainPageNavigatorKey.currentState!
+                        .pushReplacementNamed('/auteurs');
                   },
                 ),
                 ListTile(
                   title: const Text('Genres'),
                   onTap: () {
                     Navigator.pop(context);
+                    mainPageNavigatorKey.currentState!
+                        .pushReplacementNamed('/genres');
                   },
                 ),
                 ListTile(

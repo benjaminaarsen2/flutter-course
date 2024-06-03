@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/auteurs.dart';
 import 'package:flutter_application_1/pages/boeken.dart';
+import 'package:flutter_application_1/pages/create_update.dart';
+import 'package:flutter_application_1/pages/genres.dart';
 import 'package:flutter_application_1/pages/login.dart';
 import 'package:flutter_application_1/providers/login_manager.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +26,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(fontFamily: 'Inter'),
       navigatorKey: appNavigatorKey,
       title: 'Flutter Demo',
-      home: MainPage(),
+      home: const MainPage(),
     );
   }
 }
@@ -32,7 +35,7 @@ final GlobalKey<NavigatorState> mainPageNavigatorKey =
     GlobalKey<NavigatorState>();
 
 class MainPage extends StatelessWidget {
-  MainPage({super.key});
+  const MainPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +70,20 @@ class MainPage extends StatelessWidget {
               break;
             case '/boeken':
               builder = (BuildContext _) => const Boeken();
+              break;
+            case '/auteurs':
+              builder = (BuildContext _) => const Auteurs();
+              break;
+            case '/genres':
+              builder = (BuildContext _) => const Genres();
+              break;
+            case '/create_update_boek':
+              final args = settings.arguments as CreateUpdateBoekArguments;
+              builder = (BuildContext _) => CreateUpdateBoek(boek: args.boek);
+              break;
+            case '/create_update':
+              final args = settings.arguments as CreateUpdatePageArguments;
+              builder = (BuildContext _) => CreateUpdatePage(arguments: args);
               break;
             default:
               throw Exception('Invalid route: ${settings.name}');

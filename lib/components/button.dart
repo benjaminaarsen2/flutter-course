@@ -45,3 +45,26 @@ class CustomButton extends StatelessWidget {
     );
   }
 }
+
+class CustomRoundButton extends StatelessWidget {
+  const CustomRoundButton(
+      {required Key key, required this.onPressed, required this.child})
+      : super(key: key);
+  final VoidCallback onPressed;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      style: ButtonStyle(
+        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+            const EdgeInsets.all(0)),
+        shape: WidgetStateProperty.all<OutlinedBorder>(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+        backgroundColor: WidgetStateProperty.all<Color>(Colors.deepPurple),
+      ),
+      onPressed: onPressed,
+      child: child,
+    );
+  }
+}
