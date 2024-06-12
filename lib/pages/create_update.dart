@@ -1,8 +1,11 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/button.dart';
-import 'package:flutter_application_1/storage_classes/boek.dart';
+import 'package:flutter_application_1/providers/api_manager.dart';
+import 'package:flutter_application_1/storage_classes/book.dart';
+import 'package:multi_dropdown/multiselect_dropdown.dart';
+
+import '../storage_classes/author.dart';
+import '../storage_classes/genre.dart';
 
 /*
   TODO: implement some kind of class inheritance so that the CreateUpdatePage can be used for all classes
@@ -11,16 +14,16 @@ import 'package:flutter_application_1/storage_classes/boek.dart';
 enum CreateUpdatePageType { create, update }
 
 abstract class CreatePageArguments {
-  final String apiRoute;
-  final CreateUpdatePageType type;
+  final String apiEndpoint; // for example 'books' or 'authors'
+  final CreateUpdatePageType crudType; // create or update
 
-  CreatePageArguments({required this.apiRoute, required this.type});
+  CreatePageArguments({required this.apiEndpoint, required this.crudType});
 }
 
 class CreateUpdatePageArguments extends CreatePageArguments {
-  final int? id;
+  final int? id; // id of the object to update
   CreateUpdatePageArguments(
-      {required super.apiRoute, required super.type, this.id});
+      {required super.apiEndpoint, required super.crudType, this.id});
 }
 
 class CreateUpdatePage extends StatelessWidget {
@@ -29,85 +32,83 @@ class CreateUpdatePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        children: [
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Titel'),
-            initialValue:
-                arguments.type == CreateUpdatePageType.update ? 'test' : null,
-          ),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Beschrijving'),
-          ),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Genre'),
-          ),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Auteur'),
-          ),
-          Container(
-            margin: const EdgeInsets.only(top: 20),
-            child: CustomButton(
-                key: const Key('create_update_button'),
-                onPressed: () => {},
-                child: Text(
-                    arguments.type == CreateUpdatePageType.create
-                        ? 'Create'
-                        : 'Update',
-                    style: const TextStyle(
-                      color: Colors.white,
-                    ))),
-          )
-        ],
-      ),
-    ));
+    switch (arguments.apiEndpoint) {
+      case 'boek':
+        Future<Book> boek = ApiManager.fetchBook(arguments.id.toString());
+        return CreateUpdateBook(
+          book: boek,
+        );
+      default:
+        return Text('Page ${arguments.apiEndpoint} not found');
+    }
   }
 }
 
-class CreateUpdateBoekArguments {
-  final Boek boek;
-  CreateUpdateBoekArguments({required this.boek});
+class CreateUpdateBookArguments {
+  final Book book;
+  CreateUpdateBookArguments({required this.book});
 }
 
-class CreateUpdateBoek extends StatelessWidget {
-  final Boek boek;
+class CreateUpdateBook extends StatelessWidget {
+  final Future<Book> book;
 
-  const CreateUpdateBoek({super.key, required this.boek});
+  const CreateUpdateBook({super.key, required this.book});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        children: [
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Titel'),
-            initialValue: boek.name,
-          ),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Genre'),
-            initialValue: boek.genres.map((e) => e.name).join(', '),
-          ),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Auteur'),
-            initialValue: boek.author.name,
-          ),
-          Container(
-            margin: const EdgeInsets.only(top: 20),
-            child: CustomButton(
-                key: const Key('create_update_button'),
-                onPressed: () => {},
-                child: const Text('Update',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ))),
-          )
-        ],
-      ),
-    ));
+    String name;
+    List<Genre> genres;
+    Author author;
+
+    List<String> genreNames = [];
+    String authorName = '';
+
+    return FutureBuilder<Book>(
+      future: book,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          Book boekData = snapshot.data!;
+          return Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Form(
+                child: Column(
+                  children: [
+                    TextFormField(
+                      decoration: const InputDecoration(labelText: 'Titel'),
+                      initialValue: boekData.name,
+                      onChanged: (value) => name = value,
+                      validator: (value) =>
+                          value!.isEmpty ? 'Vul een titel in' : null,
+                    ),
+                    // TODO: Genre multidropdown
+                    MultiSelectDropDown(
+                        onOptionSelected: (option) {}, options: []),
+                    // TODO: Auteur dropdown
+                    Container(
+                      margin: const EdgeInsets.only(top: 20),
+                      child: CustomButton(
+                        key: const Key('create_update_button'),
+                        onPressed: () => {},
+                        child: const Text(
+                          'Update',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+      },
+    );
   }
 }

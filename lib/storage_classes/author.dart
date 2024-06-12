@@ -1,11 +1,11 @@
-class Auteur {
+class Author {
   final int id;
   final String name;
   final int age;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  Auteur({
+  Author({
     required this.id,
     required this.name,
     required this.age,
@@ -13,8 +13,8 @@ class Auteur {
     required this.updatedAt,
   });
 
-  factory Auteur.fromJson(Map<String, dynamic> json) {
-    return Auteur(
+  factory Author.fromJson(Map<String, dynamic> json) {
+    return Author(
       id: json['id'],
       name: json['name'],
       age: json['age'],

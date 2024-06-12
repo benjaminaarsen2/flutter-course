@@ -33,7 +33,7 @@ class CustomDrawer extends Drawer {
                   onTap: () {
                     Navigator.pop(context);
                     mainPageNavigatorKey.currentState!
-                        .pushReplacementNamed('/auteurs');
+                        .pushReplacementNamed('/authors');
                   },
                 ),
                 ListTile(
@@ -49,7 +49,7 @@ class CustomDrawer extends Drawer {
                   onTap: () {
                     Navigator.pop(context);
                     mainPageNavigatorKey.currentState!
-                        .pushReplacementNamed('/boeken');
+                        .pushReplacementNamed('/books');
                   },
                 ),
                 Consumer<LoginManager>(

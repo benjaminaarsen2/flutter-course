@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/cards_page.dart';
 import 'package:flutter_application_1/components/clickable_card.dart';
 import 'package:flutter_application_1/providers/api_manager.dart';
-import 'package:flutter_application_1/storage_classes/auteur.dart';
+import 'package:flutter_application_1/storage_classes/author.dart';
 
-class Auteurs extends StatelessWidget {
-  const Auteurs({super.key});
+class Authors extends StatelessWidget {
+  const Authors({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Auteur>>(
+    return FutureBuilder<List<Author>>(
       future: ApiManager.fetchAuthors(),
-      builder: (BuildContext context, AsyncSnapshot<List<Auteur>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<List<Author>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator(),
@@ -22,7 +22,7 @@ class Auteurs extends StatelessWidget {
           return CardsPage(
               title: 'Auteurs',
               cards: snapshot.data!
-                  .map((auteur) => _AuteurItem(
+                  .map((auteur) => _AuthorItem(
                         auteur: auteur,
                       ))
                   .toList());
@@ -32,11 +32,11 @@ class Auteurs extends StatelessWidget {
   }
 }
 
-class _AuteurItem extends StatelessWidget {
-  final Auteur auteur;
+class _AuthorItem extends StatelessWidget {
+  final Author auteur;
 
-  Auteur get getAuteur => auteur;
-  const _AuteurItem({required this.auteur});
+  Author get getAuteur => auteur;
+  const _AuthorItem({required this.auteur});
 
   @override
   Widget build(BuildContext context) {

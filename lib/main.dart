@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/auteurs.dart';
-import 'package:flutter_application_1/pages/boeken.dart';
+import 'package:flutter_application_1/pages/authors.dart';
+import 'package:flutter_application_1/pages/books.dart';
 import 'package:flutter_application_1/pages/create_update.dart';
 import 'package:flutter_application_1/pages/genres.dart';
 import 'package:flutter_application_1/pages/login.dart';
+import 'package:flutter_application_1/providers/api_manager.dart';
 import 'package:flutter_application_1/providers/login_manager.dart';
 import 'package:provider/provider.dart';
 import 'components/app_bar.dart';
@@ -57,7 +58,7 @@ class MainPage extends StatelessWidget {
               builder = (BuildContext _) => Consumer<LoginManager>(
                     builder: (context, loginProvider, child) {
                       if (loginProvider.isLoggedIn) {
-                        return const Boeken(
+                        return const Books(
                             key: Key(
                                 'boeken')); // Show Dashboard if user is logged in
                       } else {
@@ -68,22 +69,30 @@ class MainPage extends StatelessWidget {
                     },
                   );
               break;
-            case '/boeken':
-              builder = (BuildContext _) => const Boeken();
+            case '/books':
+              builder = (BuildContext _) => const Books();
               break;
-            case '/auteurs':
-              builder = (BuildContext _) => const Auteurs();
+            case '/authors':
+              builder = (BuildContext _) => const Authors();
               break;
             case '/genres':
               builder = (BuildContext _) => const Genres();
               break;
             case '/create_update_boek':
-              final args = settings.arguments as CreateUpdateBoekArguments;
-              builder = (BuildContext _) => CreateUpdateBoek(boek: args.boek);
+              final args = settings.arguments as CreateUpdateBookArguments;
+              builder = (BuildContext _) =>
+                  CreateUpdateBook(book: Future.value(args.book));
               break;
             case '/create_update':
               final args = settings.arguments as CreateUpdatePageArguments;
-              builder = (BuildContext _) => CreateUpdatePage(arguments: args);
+              switch (args.apiEndpoint) {
+                case 'books':
+                  builder = (BuildContext _) => CreateUpdateBook(
+                      book: ApiManager.fetchBook(args.id.toString()));
+                  break;
+                default:
+                  throw Exception('Invalid page type: ${args.apiEndpoint}');
+              }
               break;
             default:
               throw Exception('Invalid route: ${settings.name}');

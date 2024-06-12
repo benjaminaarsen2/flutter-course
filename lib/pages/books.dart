@@ -4,16 +4,16 @@ import 'package:flutter_application_1/components/clickable_card.dart';
 import 'package:flutter_application_1/main.dart';
 import 'package:flutter_application_1/pages/create_update.dart';
 import 'package:flutter_application_1/providers/api_manager.dart';
-import 'package:flutter_application_1/storage_classes/boek.dart';
+import 'package:flutter_application_1/storage_classes/book.dart';
 
-class Boeken extends StatelessWidget {
-  const Boeken({super.key});
+class Books extends StatelessWidget {
+  const Books({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Boek>>(
+    return FutureBuilder<List<Book>>(
       future: ApiManager.fetchBooks(),
-      builder: (BuildContext context, AsyncSnapshot<List<Boek>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<List<Book>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator(),
@@ -24,7 +24,7 @@ class Boeken extends StatelessWidget {
           return CardsPage(
               title: 'Boeken',
               cards: snapshot.data!
-                  .map((boek) => _BoekItem(
+                  .map((boek) => _BookItem(
                         boek: boek,
                       ))
                   .toList());
@@ -34,11 +34,11 @@ class Boeken extends StatelessWidget {
   }
 }
 
-class _BoekItem extends StatelessWidget {
-  final Boek boek;
+class _BookItem extends StatelessWidget {
+  final Book boek;
 
-  Boek get getBoek => boek;
-  const _BoekItem({required this.boek});
+  Book get getBoek => boek;
+  const _BookItem({required this.boek});
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +48,11 @@ class _BoekItem extends StatelessWidget {
         subtitle: Text(boek.author.name),
       ),
       onPressed: () => {
-        mainPageNavigatorKey.currentState!.pushNamed('/create_update_boek',
-            arguments: CreateUpdateBoekArguments(boek: boek))
+        mainPageNavigatorKey.currentState!.pushNamed('/create_update',
+            arguments: CreateUpdatePageArguments(
+                apiEndpoint: 'books',
+                crudType: CreateUpdatePageType.update,
+                id: boek.id))
       },
     );
   }

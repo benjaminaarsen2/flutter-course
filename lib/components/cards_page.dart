@@ -42,11 +42,12 @@ class CardsPage extends StatelessWidget {
           child: CustomRoundButton(
               key: const Key('add_item_button'),
               onPressed: () => {
-                    mainPageNavigatorKey.currentState!.pushNamed(
-                        '/create_update',
-                        arguments: CreateUpdatePageArguments(
-                            apiRoute: 'books',
-                            type: CreateUpdatePageType.create))
+                    mainPageNavigatorKey.currentState!
+                        .pushNamed('/create_update',
+                            arguments: CreateUpdatePageArguments(
+                              apiEndpoint: 'books',
+                              crudType: CreateUpdatePageType.create,
+                            ))
                   },
               child: const Icon(
                 Icons.add,

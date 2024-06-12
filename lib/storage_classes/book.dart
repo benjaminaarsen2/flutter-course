@@ -1,15 +1,15 @@
-import 'package:flutter_application_1/storage_classes/auteur.dart';
+import 'package:flutter_application_1/storage_classes/author.dart';
 import 'package:flutter_application_1/storage_classes/genre.dart';
 
-class Boek {
+class Book {
   final String name;
-  final Auteur author;
+  final Author author;
   final int id;
   final List<Genre> genres;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  Boek({
+  Book({
     required this.name,
     required this.author,
     required this.id,
@@ -18,12 +18,12 @@ class Boek {
     required this.updatedAt,
   });
 
-  factory Boek.fromJson(Map<String, dynamic> json) {
-    return Boek(
+  factory Book.fromJson(Map<String, dynamic> json) {
+    return Book(
       name: json['name'],
       author: json['author'] != null
-          ? Auteur.fromJson(json['author'])
-          : Auteur(
+          ? Author.fromJson(json['author'])
+          : Author(
               id: 0,
               name: 'Unknown',
               age: 0,
