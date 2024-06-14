@@ -63,15 +63,18 @@ class CreateUpdateBook extends StatelessWidget {
     List<String> genreNames = [];
     String authorName = '';
 
-    return FutureBuilder<Book>(
-      future: book,
+    return FutureBuilder<List<dynamic>>(
+      future: Future.wait(
+          [book, ApiManager.fetchGenres(), ApiManager.fetchAuthors()]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
-          Book boekData = snapshot.data!;
+          Book boekData = snapshot.data![0];
+          List<Genre> genresData = snapshot.data![1];
+          List<Author> authorsData = snapshot.data![2];
           return Scaffold(
             body: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -86,8 +89,33 @@ class CreateUpdateBook extends StatelessWidget {
                           value!.isEmpty ? 'Vul een titel in' : null,
                     ),
                     // TODO: Genre multidropdown
+                    const Padding(padding: EdgeInsets.only(top: 20)),
                     MultiSelectDropDown(
-                        onOptionSelected: (option) {}, options: []),
+                      onOptionSelected: (option) {},
+                      options: genresData.map((genre) {
+                        return ValueItem(
+                            label: genre.name, value: genre.id.toString());
+                      }).toList(),
+                      selectedOptions: boekData.genres.map((genre) {
+                        return ValueItem(
+                            label: genre.name, value: genre.id.toString());
+                      }).toList(),
+                    ),
+                    const Padding(padding: EdgeInsets.only(top: 20)),
+                    MultiSelectDropDown(
+                      selectionType: SelectionType.single,
+                      onOptionSelected: (option) {},
+                      options: authorsData.map((author) {
+                        return ValueItem(
+                            label: author.name, value: author.id.toString());
+                      }).toList(),
+                      selectedOptions: [
+                        ValueItem(
+                            label: boekData.author.name,
+                            value: boekData.author.id.toString())
+                      ],
+                    ),
+
                     // TODO: Auteur dropdown
                     Container(
                       margin: const EdgeInsets.only(top: 20),

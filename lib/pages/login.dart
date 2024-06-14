@@ -74,6 +74,7 @@ class LoginFormState extends State<LoginForm> {
             onChanged: (value) => email = value,
           ),
           TextFormField(
+            obscureText: true,
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(), labelText: 'Wachtwoord'),
             validator: (value) =>
