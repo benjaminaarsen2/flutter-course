@@ -6,8 +6,13 @@ import 'package:flutter_application_1/pages/create_update.dart';
 class CardsPage extends StatelessWidget {
   final List<Widget> cards;
   final String title;
+  final String apiEndpoint;
 
-  const CardsPage({super.key, required this.title, required this.cards});
+  const CardsPage(
+      {super.key,
+      required this.title,
+      required this.cards,
+      required this.apiEndpoint});
 
   @override
   Widget build(BuildContext context) {

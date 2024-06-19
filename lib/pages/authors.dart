@@ -20,6 +20,7 @@ class Authors extends StatelessWidget {
           return Text('Error: ${snapshot.error}');
         } else {
           return CardsPage(
+              apiEndpoint: 'authors',
               title: 'Auteurs',
               cards: snapshot.data!
                   .map((auteur) => _AuthorItem(

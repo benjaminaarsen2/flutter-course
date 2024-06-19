@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Author {
   final int id;
   final String name;
@@ -21,5 +23,25 @@ class Author {
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'age': age,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
+
+  factory Author.fromString(String jsonString) {
+    print(jsonString);
+    return Author.fromJson(json.decode(jsonString));
+  }
+
+  @override
+  String toString() {
+    return json.encode(toJson());
   }
 }

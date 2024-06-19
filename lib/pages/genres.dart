@@ -20,6 +20,7 @@ class Genres extends StatelessWidget {
           return Text('Error: ${snapshot.error}');
         } else {
           return CardsPage(
+              apiEndpoint: 'genres',
               title: 'Genres',
               cards: snapshot.data!
                   .map((genre) => _GenreItem(

@@ -78,17 +78,13 @@ class MainPage extends StatelessWidget {
             case '/genres':
               builder = (BuildContext _) => const Genres();
               break;
-            case '/create_update_boek':
-              final args = settings.arguments as CreateUpdateBookArguments;
-              builder = (BuildContext _) =>
-                  CreateUpdateBook(book: Future.value(args.book));
-              break;
             case '/create_update':
               final args = settings.arguments as CreateUpdatePageArguments;
               switch (args.apiEndpoint) {
                 case 'books':
                   builder = (BuildContext _) => CreateUpdateBook(
-                      book: ApiManager.fetchBook(args.id.toString()));
+                        pageArgs: args,
+                      );
                   break;
                 default:
                   throw Exception('Invalid page type: ${args.apiEndpoint}');

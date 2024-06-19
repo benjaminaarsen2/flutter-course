@@ -26,105 +26,137 @@ class CreateUpdatePageArguments extends CreatePageArguments {
       {required super.apiEndpoint, required super.crudType, this.id});
 }
 
-class CreateUpdatePage extends StatelessWidget {
-  final CreateUpdatePageArguments arguments;
-  const CreateUpdatePage({super.key, required this.arguments});
-
-  @override
-  Widget build(BuildContext context) {
-    switch (arguments.apiEndpoint) {
-      case 'boek':
-        Future<Book> boek = ApiManager.fetchBook(arguments.id.toString());
-        return CreateUpdateBook(
-          book: boek,
-        );
-      default:
-        return Text('Page ${arguments.apiEndpoint} not found');
-    }
-  }
-}
-
 class CreateUpdateBookArguments {
   final Book book;
   CreateUpdateBookArguments({required this.book});
 }
 
 class CreateUpdateBook extends StatelessWidget {
-  final Future<Book> book;
+  final CreateUpdatePageArguments pageArgs;
+  late final Future<Book>? book;
 
-  const CreateUpdateBook({super.key, required this.book});
+  CreateUpdateBook({super.key, required this.pageArgs}) {
+    book = pageArgs.id != null
+        ? ApiManager.fetchBook(pageArgs.id.toString())
+        : null;
+  }
 
   @override
   Widget build(BuildContext context) {
-    String name;
-    List<Genre> genres;
-    Author author;
+    String name = '';
 
-    List<String> genreNames = [];
-    String authorName = '';
+    final MultiSelectController<String> genreController =
+        MultiSelectController();
+    final MultiSelectController<String> authorController =
+        MultiSelectController();
+
+    final formKey = GlobalKey<FormState>();
 
     return FutureBuilder<List<dynamic>>(
-      future: Future.wait(
-          [book, ApiManager.fetchGenres(), ApiManager.fetchAuthors()]),
+      future: Future.wait([
+        if (book != null) book!,
+        ApiManager.fetchGenres(),
+        ApiManager.fetchAuthors()
+      ]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
-          Book boekData = snapshot.data![0];
-          List<Genre> genresData = snapshot.data![1];
-          List<Author> authorsData = snapshot.data![2];
+          Book? boekData = book != null ? snapshot.data![0] : null;
+          List<Genre> genresData = snapshot.data![boekData != null ? 1 : 0];
+          List<Author> authorsData = snapshot.data![boekData != null ? 2 : 1];
           return Scaffold(
             body: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Form(
+                key: formKey,
                 child: Column(
                   children: [
+                    const Padding(padding: EdgeInsets.only(top: 20)),
+                    Text(
+                        pageArgs.crudType == CreateUpdatePageType.create
+                            ? "Voeg een boek toe"
+                            : "Bewerk een boek",
+                        style: const TextStyle(fontSize: 35)),
+                    const Padding(padding: EdgeInsets.only(top: 20)),
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Titel'),
-                      initialValue: boekData.name,
+                      initialValue: boekData?.name,
                       onChanged: (value) => name = value,
                       validator: (value) =>
                           value!.isEmpty ? 'Vul een titel in' : null,
                     ),
-                    // TODO: Genre multidropdown
                     const Padding(padding: EdgeInsets.only(top: 20)),
                     MultiSelectDropDown(
+                      hint: 'Genres',
+                      controller: genreController,
                       onOptionSelected: (option) {},
                       options: genresData.map((genre) {
                         return ValueItem(
-                            label: genre.name, value: genre.id.toString());
+                            label: genre.name, value: genre.toString());
                       }).toList(),
-                      selectedOptions: boekData.genres.map((genre) {
-                        return ValueItem(
-                            label: genre.name, value: genre.id.toString());
-                      }).toList(),
+                      selectedOptions: boekData != null
+                          ? boekData.genres.map((genre) {
+                              return ValueItem(
+                                  label: genre.name, value: genre.toString());
+                            }).toList()
+                          : <ValueItem<String>>[],
                     ),
                     const Padding(padding: EdgeInsets.only(top: 20)),
                     MultiSelectDropDown(
+                      hint: 'Auteur',
+                      controller: authorController,
                       selectionType: SelectionType.single,
                       onOptionSelected: (option) {},
                       options: authorsData.map((author) {
                         return ValueItem(
-                            label: author.name, value: author.id.toString());
+                            label: author.name, value: author.toString());
                       }).toList(),
-                      selectedOptions: [
-                        ValueItem(
-                            label: boekData.author.name,
-                            value: boekData.author.id.toString())
-                      ],
+                      selectedOptions: boekData != null
+                          ? [
+                              ValueItem(
+                                  label: boekData.author.name,
+                                  value: boekData.author.toString())
+                            ]
+                          : <ValueItem<String>>[],
                     ),
-
-                    // TODO: Auteur dropdown
                     Container(
                       margin: const EdgeInsets.only(top: 20),
                       child: CustomButton(
                         key: const Key('create_update_button'),
-                        onPressed: () => {},
-                        child: const Text(
-                          'Update',
-                          style: TextStyle(
+                        onPressed: () {
+                          final valid = formKey.currentState!.validate();
+                          if (!valid) {
+                            return;
+                          }
+                          if (pageArgs.crudType ==
+                              CreateUpdatePageType.create) {
+                            ApiManager.createBook(Book(
+                              name: name,
+                              author: Author.fromString(authorController
+                                  .selectedOptions.first.value!),
+                              genres:
+                                  genreController.selectedOptions.map((genre) {
+                                return Genre.fromString(genre.value!);
+                              }).toList(),
+                              createdAt: DateTime.now(),
+                              updatedAt: DateTime.now(),
+                            ));
+                          } else {
+                            // ApiManager.updateBook(
+                            //     id: boekData.id,
+                            //     name: name,
+                            //     authorId: authorId,
+                            //     genreIds: genreIds);
+                          }
+                        },
+                        child: Text(
+                          pageArgs.crudType == CreateUpdatePageType.create
+                              ? 'Voeg toe'
+                              : 'Update',
+                          style: const TextStyle(
                             color: Colors.white,
                           ),
                         ),

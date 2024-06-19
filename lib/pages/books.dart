@@ -22,6 +22,7 @@ class Books extends StatelessWidget {
           return Text('Error: ${snapshot.error}');
         } else {
           return CardsPage(
+              apiEndpoint: 'books',
               title: 'Boeken',
               cards: snapshot.data!
                   .map((boek) => _BookItem(

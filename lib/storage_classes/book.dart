@@ -12,7 +12,7 @@ class Book {
   Book({
     required this.name,
     required this.author,
-    required this.id,
+    this.id = 0,
     required this.genres,
     required this.createdAt,
     required this.updatedAt,
